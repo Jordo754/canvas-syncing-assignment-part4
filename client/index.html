@@ -1,13 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
-    <script type="text/babel" >
-        "use strict";
-    
-    </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+  <script type="text/babel" >
+    (function(){
+      "use strict";
+      //canvas atts
+      let canvas;
+      let ctx;
+      let sendBufferCanvas;
+      let sendBufferCtx;
+      let socket;
+
+      //picture atts
+      let picChoose;
+      let picToUse = 'redPanda';
+      
+
+      const sendUpdate = (mouse) => {
+        if (picToUse === "redPanda") {
+            sendBufferCtx.drawImage(redPanda, 0, 0);
+          }
+          if (picToUse === "tree") {
+            sendBufferCtx.drawImage(tree, 0, 0);
+          }
+          if (picToUse === "lube") {
+            sendBufferCtx.drawImage(lube, 0, 0);
+          }
+        
+        
+        const data = {
+          x: mouse.x - 50,
+          y: mouse.y - 50,
+          height: 100,
+          width: 100,
+          imgData: sendBufferCanvas.toDataURL(),
+        };
+
+        socket.emit('clientUpdate', data);
+      };
+
+      const update = (data) => {
+        let image = new Image();
+        
+        image.onload = () => {
+          ctx.save();
+          ctx.globalCompositeOperation = "source-over";
+          ctx.drawImage(image, data.x, data.y, data.width, data.height);
+        }
+        
+        image.src = data.imgData;
+      };
+
+      const ioInit = () => {
+        socket = io.connect();
+
+        socket.on('serverUpdate', update);
+      };
+
+      const canvasInit = () => {
+        canvas = document.querySelector('canvas');
+        ctx = canvas.getContext('2d');
+        sendBufferCanvas = document.createElement('canvas');
+        sendBufferCanvas.width = 100;
+        sendBufferCanvas.height = 100;
+        sendBufferCtx = sendBufferCanvas.getContext('2d');
+
+        canvas.onclick = (e) => {
+          //get mouse
+          var mouse = {}
+          mouse.x = e.pageX - e.target.offsetLeft;
+          mouse.y = e.pageY - e.target.offsetTop;
+
+          //send server an update
+          sendUpdate(mouse);
+        };
+      };
+
+      const pictureInit = () => {
+        picChoose = document.querySelector('#pictureChoose');
+        
+        picChoose.onchange = (e) => {
+          picToUse = e.target.value;
+        };
+      };
+
+      const init = () => {
+        canvasInit();
+
+        //ioInit();
+
+        pictureInit();
+        
+        let redPanda = new Image();
+        console.log('new image');
+        redPanda.onload = () => {
+          console.log('loaded');
+          ctx.drawImage(redPanda, 0, 0, 100, 100);
+          console.log('draw');
+        };
+        redPanda.src = "../pictures/redPanda.png";
+        console.log('src');
+      };
+
+      window.onload = init;
+    }());
+  </script>
 </head>
 <body>
-
+  <canvas width="500" height="300">
+    Get a real browser!
+  </canvas>
+  
+  <label>Picture: 
+    <select id="pictureChoose">
+      <option value="redPanda" selected>Red Panda</option>
+      <option value="tree">Tree</option>
+      <option value="lube">Passion</option>
+    </select>
+  </label>
 </body>
 </html>
