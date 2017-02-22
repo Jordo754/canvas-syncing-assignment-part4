@@ -13,13 +13,15 @@
       let sendBufferCtx;
       let socket;
 
-      //picture atts
+      //picture atts 
+      /*does not work
       let picChoose;
       let picToUse = 'redPanda';
-      
+      let redPanda, tree, passion; */
 
       const sendUpdate = (mouse) => {
-        if (picToUse === "redPanda") {
+        /*does not work
+          if (picToUse === "redPanda") {
             sendBufferCtx.drawImage(redPanda, 0, 0);
           }
           if (picToUse === "tree") {
@@ -27,8 +29,12 @@
           }
           if (picToUse === "lube") {
             sendBufferCtx.drawImage(lube, 0, 0);
-          }
-        
+          }*/
+        let color = `rgb(${Math.round(Math.random()*254+1)}, ${Math.round(Math.random()*254+1)}, ${Math.round(Math.random()*254+1)})`
+        sendBufferCtx.fillStyle = color;
+        sendBufferCtx.fillRect(0, 0, 100, 100);
+        ctx.fillStyle = color;
+        ctx.fillRect(mouse.x - 50, mouse.y - 50, 100, 100);
         
         const data = {
           x: mouse.x - 50,
@@ -78,8 +84,25 @@
         };
       };
 
+      //does not work
       const pictureInit = () => {
         picChoose = document.querySelector('#pictureChoose');
+        
+        redPanda = new Image();
+        redPanda.onload = () => {
+         
+        }
+        redPanda.src = '../pictures/redPanda.png';
+        tree = new Image();
+        tree.onload = () => {
+         
+        }
+        tree.src = '../pictures/tree.png';
+        passion = new Image();
+        passion.onload = () => {
+         
+        }
+        passion.src = '../pictures/lube.png';
         
         picChoose.onchange = (e) => {
           picToUse = e.target.value;
@@ -89,19 +112,9 @@
       const init = () => {
         canvasInit();
 
-        //ioInit();
+        ioInit();
 
-        pictureInit();
-        
-        let redPanda = new Image();
-        console.log('new image');
-        redPanda.onload = () => {
-          console.log('loaded');
-          ctx.drawImage(redPanda, 0, 0, 100, 100);
-          console.log('draw');
-        };
-        redPanda.src = "../pictures/redPanda.png";
-        console.log('src');
+        //pictureInit();
       };
 
       window.onload = init;
@@ -113,7 +126,7 @@
     Get a real browser!
   </canvas>
   
-  <label>Picture: 
+  <label>Does Not Work: 
     <select id="pictureChoose">
       <option value="redPanda" selected>Red Panda</option>
       <option value="tree">Tree</option>
